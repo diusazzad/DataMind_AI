@@ -1,7 +1,8 @@
 import re
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from sqlalchemy import inspect, text
+
 from app.core.database import engine
 from app.models.schemas import SqlQueryResponse
 
@@ -70,8 +71,10 @@ class SqlEngineService:
         )
 
     @classmethod
-    def generate_sql_from_prompt(cls, prompt: str, schema: Dict[str, List[str]]) -> str:
-        """Simple rule-based and template generator for natural queries when LLM key is absent."""
+    def generate_sql_from_prompt(cls, prompt: str, schema: Optional[Dict[str, List[str]]] = None) -> str:
+        """Rule-based and template generator for natural queries when LLM key is absent."""
+        if schema is None:
+            schema = cls.get_database_schema()
         prompt_lower = prompt.lower()
 
         # Find best matching table
@@ -97,3 +100,7 @@ class SqlEngineService:
         limit_val = limit_match.group(1) or limit_match.group(2) or limit_match.group(3) if limit_match else 10
 
         return f"SELECT * FROM {matched_table} LIMIT {limit_val};"
+
+
+sql_engine = SqlEngineService
+

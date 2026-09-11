@@ -63,3 +63,60 @@ class SqlQueryResponse(BaseModel):
     columns: List[str]
     results: List[Dict[str, Any]]
     execution_time_ms: float
+
+
+class DocumentInfo(BaseModel):
+    document_id: str
+    document_name: str
+    total_pages: int
+    total_chunks: int
+    file_size_kb: float
+    created_at: str
+
+
+class RagUploadResponse(BaseModel):
+    success: bool
+    document: DocumentInfo
+    message: str
+
+
+class RagQueryRequest(BaseModel):
+    question: str = Field(..., description="Natural language question to ask your documents")
+    document_id: Optional[str] = Field(default=None, description="Optional document ID filter")
+    top_k: int = Field(default=4, description="Number of most relevant context chunks to retrieve")
+
+
+class RagCitation(BaseModel):
+    document_name: str
+    page_number: int
+    relevance_percentage: float
+    snippet: str
+
+
+class RagQueryResponse(BaseModel):
+    question: str
+    answer: str
+    citations: List[RagCitation]
+    retrieved_chunks_count: int
+    latency_ms: float
+
+
+class ChatMessage(BaseModel):
+    role: str = Field(default="user", description="'user', 'assistant', or 'system'")
+    content: str
+
+
+class AgentChatRequest(BaseModel):
+    message: str = Field(..., description="User query or instruction")
+    history: List[ChatMessage] = Field(default_factory=list, description="Previous conversation turns")
+
+
+class AgentChatResponse(BaseModel):
+    reply: str
+    intent: str
+    tool_used: Optional[str] = None
+    tool_output: Optional[Dict[str, Any]] = None
+    citations: Optional[List[RagCitation]] = None
+    latency_ms: float
+
+
