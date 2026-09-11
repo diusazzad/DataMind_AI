@@ -1,0 +1,23 @@
+# DataMind AI Core Dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.9.0
+pydantic-settings>=2.5.0
+python-multipart>=0.0.9
+python-dotenv>=1.0.1
+jinja2>=3.1.4
+
+# Data Processing & Analytics
+pandas>=2.2.0
+numpy>=1.26.0
+
+# Database & Storage
+sqlalchemy>=2.0.30
+
+# Documentation & Site
+mkdocs>=1.6.0
+mkdocs-material>=9.5.0
+
+# Development & Testing
+pytest>=8.3.0
+httpx>=0.27.0

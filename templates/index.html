@@ -11,6 +11,81 @@
     
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .playground-card {
+            margin-top: 2.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: left;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.75rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .input-box {
+            background: #090d16;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+        .result-box {
+            background: #060911;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            max-height: 250px;
+            overflow: auto;
+            color: #38bdf8;
+            white-space: pre-wrap;
+        }
+        .mini-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -19,9 +94,9 @@
     <div class="blob blob-2"></div>
 
     <!-- Live Status Indicator -->
-    <div class="status">
+    <div class="status" id="status-pill">
         <div class="pulse"></div>
-        API Online
+        <span id="status-text">API Online (v{{ version }})</span>
     </div>
 
     <!-- Main Glassmorphism Container -->
@@ -48,15 +123,112 @@
         </div>
 
         <div class="btn-container">
-            <!-- Link to the auto-generated FastAPI Swagger UI docs -->
-            <a href="/docs" class="btn btn-primary">
-                <i class="fa-solid fa-rocket"></i> Explore API Docs
+            <!-- Link to the main API health -->
+            <a href="/api/health" class="btn btn-primary" target="_blank">
+                <i class="fa-solid fa-bolt"></i> Health API
             </a>
-            <a href="/redoc" class="btn btn-secondary">
-                <i class="fa-solid fa-book"></i> View ReDoc
+            <!-- Link to the auto-generated FastAPI Swagger UI docs -->
+            <a href="/docs" class="btn btn-secondary" target="_blank">
+                <i class="fa-solid fa-code"></i> Swagger UI
+            </a>
+            <!-- Link to ReDoc -->
+            <a href="/redoc" class="btn btn-secondary" target="_blank">
+                <i class="fa-solid fa-book-open"></i> ReDoc
             </a>
         </div>
+
+        <!-- Live Interactive Playground Card -->
+        <div class="playground-card">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('sql')">
+                    <i class="fa-solid fa-database"></i> Safe SQL Console
+                </button>
+                <button class="tab-btn" onclick="switchTab('analytics')">
+                    <i class="fa-solid fa-chart-bar"></i> Analytics Profiler
+                </button>
+            </div>
+
+            <!-- SQL Tab Pane -->
+            <div id="tab-sql">
+                <div class="input-group">
+                    <label style="font-size: 0.8rem; color: #94a3b8;">Enter Read-Only SQL Query:</label>
+                    <input type="text" id="sql-input" class="input-box" value="SELECT 101 AS order_id, 'Completed' AS status, 450.75 AS total, 'North America' AS region;">
+                </div>
+                <button class="mini-btn" onclick="executeSql()">
+                    <i class="fa-solid fa-play"></i> Execute Query
+                </button>
+                <div style="margin-top: 1rem;">
+                    <label style="font-size: 0.75rem; color: #64748b;">Execution Response:</label>
+                    <div id="sql-result" class="result-box">// Output will appear here...</div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab Pane -->
+            <div id="tab-analytics" style="display: none;">
+                <div class="input-group">
+                    <label style="font-size: 0.8rem; color: #94a3b8;">Test Sample CSV Data Ingestion:</label>
+                    <p style="font-size: 0.75rem; color: #64748b;">Click below to test automated data profiling via API:</p>
+                </div>
+                <button class="mini-btn" onclick="profileSampleData()">
+                    <i class="fa-solid fa-bolt"></i> Profile Sample Dataset
+                </button>
+                <div style="margin-top: 1rem;">
+                    <label style="font-size: 0.75rem; color: #64748b;">Profiling Statistics:</label>
+                    <div id="analytics-result" class="result-box">// Profiling metrics will appear here...</div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('tab-sql').style.display = tab === 'sql' ? 'block' : 'none';
+            document.getElementById('tab-analytics').style.display = tab === 'analytics' ? 'block' : 'none';
+        }
+
+        async function executeSql() {
+            const query = document.getElementById('sql-input').value;
+            const resultBox = document.getElementById('sql-result');
+            resultBox.textContent = "Executing safely...";
+            
+            try {
+                const res = await fetch('/api/v1/sql/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query_text: query })
+                });
+                const data = await res.json();
+                resultBox.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultBox.textContent = "Error: " + err.message;
+            }
+        }
+
+        async function profileSampleData() {
+            const resultBox = document.getElementById('analytics-result');
+            resultBox.textContent = "Processing sample dataset...";
+
+            const csvContent = "id,product,price,stock,category\n1,Laptop,1200,15,Electronics\n2,Mouse,25,,Accessories\n3,Keyboard,75,40,Accessories\n4,Monitor,300,10,Electronics\n5,Laptop,1200,15,Electronics";
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const formData = new FormData();
+            formData.append('file', blob, 'sample_store.csv');
+
+            try {
+                const res = await fetch('/api/v1/analytics/profile', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                resultBox.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultBox.textContent = "Error: " + err.message;
+            }
+        }
+    </script>
 
 </body>
 </html>

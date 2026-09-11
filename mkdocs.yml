@@ -18,3 +18,6 @@ nav:
   - Home: index.md
   - Architecture & PRD: idea.md
   - Setup Guide: setup_guide.md
+
+markdown_extensions:
+  - attr_list

@@ -10,3 +10,8 @@ Our platform empowers users to:
 
 ## Why DataMind AI?
 Bridging the gap between complex databases, unstructured documents, and end-users through natural language processing.
+
+<br>
+
+[🚀 Main API Workflow](/api/health){ .md-button .md-button--primary }
+[📚 Swagger API Docs](/docs){ .md-button }
