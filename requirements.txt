@@ -14,6 +14,9 @@ numpy>=1.26.0
 # Database & Storage
 sqlalchemy>=2.0.30
 
+# Document Processing & RAG
+pypdf>=5.0.0
+
 # Documentation & Site
 mkdocs>=1.6.0
 mkdocs-material>=9.5.0

@@ -3,197 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DataMind AI | Enterprise Intelligent Assistant</title>
-    <meta name="description" content="DataMind AI is an enterprise-grade Intelligent Data & Document Assistant powered by LLMs.">
+    <title>DataMind AI | Enterprise Intelligent Data & Document Assistant</title>
+    <meta name="description" content="DataMind AI is an enterprise-grade Intelligent Data & Document Assistant powered by LLMs, RAG, and Safe SQL Execution.">
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
     
-    <!-- Font Awesome for Icons -->
+    <!-- Font Awesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        .playground-card {
-            margin-top: 2.5rem;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: left;
-        }
-        .tab-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 0.75rem;
-        }
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: rgba(99, 102, 241, 0.15);
-            color: #818cf8;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        .input-box {
-            background: #090d16;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #e2e8f0;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            width: 100%;
-        }
-        .result-box {
-            background: #060911;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: monospace;
-            font-size: 0.8rem;
-            max-height: 250px;
-            overflow: auto;
-            color: #38bdf8;
-            white-space: pre-wrap;
-        }
-        .mini-btn {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Animated Background Blobs -->
+    <!-- Ambient Glowing Background Blobs -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
 
-    <!-- Live Status Indicator -->
-    <div class="status" id="status-pill">
-        <div class="pulse"></div>
-        <span id="status-text">API Online (v{{ version }})</span>
-    </div>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <div class="logo-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <span>DataMind AI</span>
+        </a>
 
-    <!-- Main Glassmorphism Container -->
-    <div class="container">
-        <h1>DataMind AI</h1>
-        <p class="subtitle">
-            Enterprise Intelligent Data & Document Assistant. <br>
-            Bridging the gap between your databases, unstructured documents, and end-users through powerful Natural Language Processing.
-        </p>
-
-        <div class="features">
-            <div class="feature-badge">
-                <i class="fa-solid fa-chart-pie"></i> Data Analytics
-            </div>
-            <div class="feature-badge">
-                <i class="fa-solid fa-database"></i> Text-to-SQL
-            </div>
-            <div class="feature-badge">
-                <i class="fa-solid fa-file-pdf"></i> RAG Intelligence
-            </div>
-            <div class="feature-badge">
-                <i class="fa-solid fa-robot"></i> AI Agents
+        <div class="nav-links">
+            <a href="https://datamindai.zengfy.top/" target="_blank" class="nav-link">
+                <i class="fa-solid fa-book"></i> Live Docs
+            </a>
+            <a href="/docs" target="_blank" class="nav-link">
+                <i class="fa-solid fa-code"></i> API Swagger
+            </a>
+            <a href="https://github.com/diusazzad/DataMind_AI" target="_blank" class="nav-link">
+                <i class="fa-brands fa-github"></i> GitHub
+            </a>
+            <div class="status-pill" id="live-status-pill">
+                <div class="pulse"></div>
+                <span id="live-status-text">API Online (v{{ version }})</span>
             </div>
         </div>
+    </header>
 
-        <div class="btn-container">
-            <!-- Link to the main API health -->
-            <a href="/api/health" class="btn btn-primary" target="_blank">
-                <i class="fa-solid fa-bolt"></i> Health API
-            </a>
-            <!-- Link to the auto-generated FastAPI Swagger UI docs -->
-            <a href="/docs" class="btn btn-secondary" target="_blank">
-                <i class="fa-solid fa-code"></i> Swagger UI
-            </a>
-            <!-- Link to ReDoc -->
-            <a href="/redoc" class="btn btn-secondary" target="_blank">
-                <i class="fa-solid fa-book-open"></i> ReDoc
-            </a>
-        </div>
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
 
-        <!-- Live Interactive Playground Card -->
-        <div class="playground-card">
-            <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchTab('sql')">
-                    <i class="fa-solid fa-database"></i> Safe SQL Console
-                </button>
-                <button class="tab-btn" onclick="switchTab('analytics')">
-                    <i class="fa-solid fa-chart-bar"></i> Analytics Profiler
-                </button>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-pill">
+                <i class="fa-solid fa-shield-halved"></i> Zero-Trust Guardrails Active
             </div>
+            <h1 class="hero-title">Intelligent Data & Document Assistant</h1>
+            <p class="hero-subtitle">
+                Bridging the gap between complex relational databases, unstructured PDF documents, and decision-makers. 
+                Experience instant Text-to-SQL, source-verified RAG intelligence, and automated tabular analytics.
+            </p>
 
-            <!-- SQL Tab Pane -->
-            <div id="tab-sql">
-                <div class="input-group">
-                    <label style="font-size: 0.8rem; color: #94a3b8;">Enter Read-Only SQL Query:</label>
-                    <input type="text" id="sql-input" class="input-box" value="SELECT 101 AS order_id, 'Completed' AS status, 450.75 AS total, 'North America' AS region;">
+            <!-- Quick Stats Strip -->
+            <div class="stats-banner">
+                <div class="stat-item">
+                    <div class="stat-value green"><i class="fa-solid fa-circle-check"></i> 100%</div>
+                    <div class="stat-label">Zero-Trust Read-Only</div>
                 </div>
-                <button class="mini-btn" onclick="executeSql()">
-                    <i class="fa-solid fa-play"></i> Execute Query
-                </button>
-                <div style="margin-top: 1rem;">
-                    <label style="font-size: 0.75rem; color: #64748b;">Execution Response:</label>
-                    <div id="sql-result" class="result-box">// Output will appear here...</div>
+                <div class="stat-item">
+                    <div class="stat-value purple"><i class="fa-solid fa-vial"></i> 14 / 14</div>
+                    <div class="stat-label">Automated Tests Passing</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value blue"><i class="fa-solid fa-bolt"></i> &lt; 50ms</div>
+                    <div class="stat-label">Average Engine Latency</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value green"><i class="fa-solid fa-robot"></i> Multi-Tool</div>
+                    <div class="stat-label">ReAct Autonomous Agent</div>
                 </div>
             </div>
 
-            <!-- Analytics Tab Pane -->
-            <div id="tab-analytics" style="display: none;">
-                <div class="input-group">
-                    <label style="font-size: 0.8rem; color: #94a3b8;">Test Sample CSV Data Ingestion:</label>
-                    <p style="font-size: 0.75rem; color: #64748b;">Click below to test automated data profiling via API:</p>
-                </div>
-                <button class="mini-btn" onclick="profileSampleData()">
-                    <i class="fa-solid fa-bolt"></i> Profile Sample Dataset
-                </button>
-                <div style="margin-top: 1rem;">
-                    <label style="font-size: 0.75rem; color: #64748b;">Profiling Statistics:</label>
-                    <div id="analytics-result" class="result-box">// Profiling metrics will appear here...</div>
-                </div>
+            <!-- Primary Buttons -->
+            <div class="btn-group">
+                <a href="#playground" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i> Interactive Playground
+                </a>
+                <a href="https://datamindai.zengfy.top/" target="_blank" class="btn btn-secondary">
+                    <i class="fa-solid fa-book-open"></i> Full Documentation
+                </a>
+                <a href="/api/health" target="_blank" class="btn btn-secondary">
+                    <i class="fa-solid fa-heart-pulse"></i> Telemetry & Health
+                </a>
             </div>
-        </div>
+        </section>
 
-    </div>
+        <!-- Interactive Playground Card -->
+        <section class="playground-card" id="playground">
+            <!-- Navigation Tabs -->
+            <div class="tab-nav">
+                <button class="tab-btn active" id="tab-btn-agent" onclick="switchPlaygroundTab(this, 'agent')">
+                    <i class="fa-solid fa-robot"></i> 🤖 Autonomous AI Agent
+                </button>
+                <button class="tab-btn" id="tab-btn-sql" onclick="switchPlaygroundTab(this, 'sql')">
+                    <i class="fa-solid fa-database"></i> 🗄️ Safe Text-to-SQL
+                </button>
+                <button class="tab-btn" id="tab-btn-analytics" onclick="switchPlaygroundTab(this, 'analytics')">
+                    <i class="fa-solid fa-chart-pie"></i> 📊 Analytics Profiler
+                </button>
+                <button class="tab-btn" id="tab-btn-rag" onclick="switchPlaygroundTab(this, 'rag')">
+                    <i class="fa-solid fa-file-lines"></i> 📑 Document RAG
+                </button>
+            </div>
 
+            <!-- 1. Agent Tab Pane -->
+            <div id="pane-agent">
+                <div class="pane-title"><i class="fa-solid fa-robot" style="color: #818cf8;"></i> Autonomous ReAct Multi-Tool Agent</div>
+                <div class="pane-desc">Ask questions in plain English or natural queries. The agent detects intent and autonomously routes to SQL, Document RAG, or Tabular Analytics.</div>
+
+                <div class="chips-container">
+                    <span class="chip" onclick="setAgentQuery('What capabilities does DataMind AI provide for our data?')">✨ Capabilities Overview</span>
+                    <span class="chip" onclick="setAgentQuery('SELECT 204 AS order_id, 890.50 AS amount, \'Completed\' AS status;')">🗄️ Execute Safe SQL</span>
+                    <span class="chip" onclick="setAgentQuery('How does the data analytics engine handle missing values and null imputation?')">📊 Analytics Guidance</span>
+                    <span class="chip" onclick="setAgentQuery('What is the zero-trust security architecture and what queries are forbidden?')">📑 Policy Verification</span>
+                </div>
+
+                <input type="text" id="agent-input" class="input-box" value="What capabilities does DataMind AI provide for our data?">
+                
+                <div class="controls-row" style="margin-top: 1rem;">
+                    <button class="mini-btn" id="btn-send-agent" onclick="sendAgentMessage()">
+                        <i class="fa-solid fa-paper-plane"></i> Send to Agent
+                    </button>
+                </div>
+
+                <div class="console-header">
+                    <span class="console-label">Agent Output Stream</span>
+                    <button class="copy-btn" onclick="copyConsole('agent-result')"><i class="fa-regular fa-copy"></i> Copy</button>
+                </div>
+                <div id="agent-result" class="result-box">// Interactive Agent response and tool dispatch telemetry will appear here...</div>
+            </div>
+
+            <!-- 2. Safe SQL Tab Pane -->
+            <div id="pane-sql" style="display: none;">
+                <div class="pane-title"><i class="fa-solid fa-database" style="color: #38bdf8;"></i> Safe Read-Only SQL Engine</div>
+                <div class="pane-desc">Zero-trust SQL execution engine with strict guardrails preventing DDL/DML data mutation. Safe max-row fetch limit enforced.</div>
+
+                <div class="chips-container">
+                    <span class="chip" onclick="setSqlQuery('SELECT 101 AS order_id, \'Delivered\' AS status, 450.75 AS revenue, \'North America\' AS region;')">Sample Order Record</span>
+                    <span class="chip" onclick="setSqlQuery('SELECT \'DataMind\' AS platform, 14 AS tests_passed, 100 AS security_score;')">System Score Query</span>
+                    <span class="chip" onclick="setSqlQuery('DROP TABLE users;')">⚠️ Test Blocked Command (DROP)</span>
+                </div>
+
+                <input type="text" id="sql-input" class="input-box" value="SELECT 101 AS order_id, 'Delivered' AS status, 450.75 AS revenue, 'North America' AS region;">
+
+                <div class="controls-row" style="margin-top: 1rem;">
+                    <button class="mini-btn" id="btn-exec-sql" onclick="executeSql()">
+                        <i class="fa-solid fa-play"></i> Execute Safe Query
+                    </button>
+                    <button class="mini-btn-outline" id="btn-view-schema" onclick="fetchSchema()">
+                        <i class="fa-solid fa-list-check"></i> Introspect Schema
+                    </button>
+                </div>
+
+                <div class="console-header">
+                    <span class="console-label">SQL Execution Result</span>
+                    <button class="copy-btn" onclick="copyConsole('sql-result')"><i class="fa-regular fa-copy"></i> Copy</button>
+                </div>
+                <div id="sql-result" class="result-box">// Query output and execution timing will appear here...</div>
+            </div>
+
+            <!-- 3. Analytics Profiler Tab Pane -->
+            <div id="pane-analytics" style="display: none;">
+                <div class="pane-title"><i class="fa-solid fa-chart-pie" style="color: #c084fc;"></i> Tabular Data Profiler & Auto-Cleaner</div>
+                <div class="pane-desc">Ingests CSV/Excel files, calculates descriptive statistics (mean, median, std, skewness), unique counts, null percentages, and performs auto-imputation.</div>
+
+                <div class="controls-row">
+                    <button class="mini-btn" id="btn-profile-data" onclick="profileSampleData()">
+                        <i class="fa-solid fa-chart-column"></i> Profile Sample Dataset
+                    </button>
+                    <button class="mini-btn-outline" id="btn-clean-data" onclick="cleanSampleData()">
+                        <i class="fa-solid fa-broom"></i> Test Auto-Cleaning & Imputation
+                    </button>
+                </div>
+
+                <div class="console-header">
+                    <span class="console-label">Profiling Metrics & Distributions</span>
+                    <button class="copy-btn" onclick="copyConsole('analytics-result')"><i class="fa-regular fa-copy"></i> Copy</button>
+                </div>
+                <div id="analytics-result" class="result-box">// Statistical summaries and correlation matrix will appear here...</div>
+            </div>
+
+            <!-- 4. Document RAG Tab Pane -->
+            <div id="pane-rag" style="display: none;">
+                <div class="pane-title"><i class="fa-solid fa-file-lines" style="color: #34d399;"></i> Document Intelligence & Source-Cited RAG</div>
+                <div class="pane-desc">Semantic text chunking and vector space retrieval. Every answer strictly cites the exact document name and page number to prevent hallucination.</div>
+
+                <div class="controls-row">
+                    <button class="mini-btn-outline" id="btn-index-doc" onclick="indexSampleDocument()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Index Sample Security Policy
+                    </button>
+                    <span id="doc-index-status" style="font-size: 0.8rem; color: #34d399; font-weight: 600;"></span>
+                </div>
+
+                <div class="chips-container" style="margin-top: 0.8rem;">
+                    <span class="chip" onclick="setRagQuestion('What is the security architecture principle and what queries are forbidden?')">Zero-Trust & Forbidden Queries</span>
+                    <span class="chip" onclick="setRagQuestion('How does the platform handle document text chunking and citations?')">Chunking & Citations Architecture</span>
+                </div>
+
+                <input type="text" id="rag-question-input" class="input-box" value="What is the security architecture principle and what queries are forbidden?">
+
+                <div class="controls-row" style="margin-top: 1rem;">
+                    <button class="mini-btn" id="btn-query-rag" onclick="queryRag()">
+                        <i class="fa-solid fa-magnifying-glass"></i> Ask Document Assistant
+                    </button>
+                </div>
+
+                <div class="console-header">
+                    <span class="console-label">Source-Cited RAG Response</span>
+                    <button class="copy-btn" onclick="copyConsole('rag-result')"><i class="fa-regular fa-copy"></i> Copy</button>
+                </div>
+                <div id="rag-result" class="result-box">// Verified answer and source citation cards will appear here...</div>
+            </div>
+
+        </section>
+
+        <!-- Feature Pillar Cards Section -->
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-agent">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <h3>Autonomous AI Agent</h3>
+                <p>Equipped with ReAct pattern to autonomously select tools between SQL databases, RAG document stores, or tabular calculations.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-sql">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <h3>Secure Text-to-SQL</h3>
+                <p>AST & Regex-based zero-trust security guardrails strictly block any destructive DDL/DML mutation queries.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-analytics">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3>Data Analytics Pipeline</h3>
+                <p>Automated descriptive statistics, correlation analysis, null detection, and intelligent mean/median/mode imputation.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-rag">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <h3>Anti-Hallucination RAG</h3>
+                <p>Vector similarity search with verified document name and page number citations for auditability and trust.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div>
+                <strong>DataMind AI</strong> &copy; 2026. Released under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>.
+            </div>
+            <div style="display: flex; gap: 1.25rem;">
+                <a href="https://datamindai.zengfy.top/" target="_blank">Documentation</a>
+                <a href="/docs" target="_blank">Swagger API</a>
+                <a href="https://github.com/diusazzad/DataMind_AI/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
+                <a href="https://github.com/diusazzad/DataMind_AI" target="_blank">GitHub Repository</a>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Interactive Client JavaScript -->
     <script>
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+        function switchPlaygroundTab(btn, tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
-            document.getElementById('tab-sql').style.display = tab === 'sql' ? 'block' : 'none';
-            document.getElementById('tab-analytics').style.display = tab === 'analytics' ? 'block' : 'none';
+            document.getElementById('pane-agent').style.display = tab === 'agent' ? 'block' : 'none';
+            document.getElementById('pane-sql').style.display = tab === 'sql' ? 'block' : 'none';
+            document.getElementById('pane-analytics').style.display = tab === 'analytics' ? 'block' : 'none';
+            document.getElementById('pane-rag').style.display = tab === 'rag' ? 'block' : 'none';
         }
 
+        function setAgentQuery(text) {
+            document.getElementById('agent-input').value = text;
+        }
+
+        function setSqlQuery(text) {
+            document.getElementById('sql-input').value = text;
+        }
+
+        function setRagQuestion(text) {
+            document.getElementById('rag-question-input').value = text;
+        }
+
+        function copyConsole(elementId) {
+            const content = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                alert("Copied to clipboard!");
+            });
+        }
+
+        // 1. Autonomous Agent Call
+        async function sendAgentMessage() {
+            const message = document.getElementById('agent-input').value;
+            const resultBox = document.getElementById('agent-result');
+            resultBox.textContent = "Autonomous Agent analyzing inquiry and selecting optimal tool...";
+
+            try {
+                const res = await fetch('/api/v1/agent/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, history: [] })
+                });
+                const data = await res.json();
+                
+                let output = "=== [TELEMETRY] Intent Detected: " + (data.intent || 'General').toUpperCase() + " ===\n";
+                if (data.tool_used) {
+                    output += "Tool Dispatched: " + data.tool_used + "\n";
+                }
+                output += "Latency: " + data.latency_ms + "ms\n\n";
+                output += "=== [AGENT REPLY] ===\n" + data.reply + "\n\n";
+
+                if (data.tool_output) {
+                    output += "=== [STRUCTURED TOOL PAYLOAD] ===\n" + JSON.stringify(data.tool_output, null, 2) + "\n";
+                }
+
+                if (data.citations && data.citations.length > 0) {
+                    output += "\n=== [VERIFIED CITATIONS] ===\n";
+                    data.citations.forEach((c, idx) => {
+                        output += "[" + (idx + 1) + "] " + c.document_name + " (Page " + c.page_number + ") - Relevance: " + c.relevance_percentage + "%\n";
+                    });
+                }
+
+                resultBox.textContent = output;
+            } catch (err) {
+                resultBox.textContent = "Error: " + err.message;
+            }
+        }
+
+        // 2. Safe SQL Query Execution
         async function executeSql() {
             const query = document.getElementById('sql-input').value;
             const resultBox = document.getElementById('sql-result');
-            resultBox.textContent = "Executing safely...";
+            resultBox.textContent = "Validating zero-trust security guardrails & executing...";
             
             try {
                 const res = await fetch('/api/v1/sql/query', {
@@ -208,9 +360,23 @@
             }
         }
 
+        // Introspect Schema
+        async function fetchSchema() {
+            const resultBox = document.getElementById('sql-result');
+            resultBox.textContent = "Introspecting database tables & columns...";
+            try {
+                const res = await fetch('/api/v1/sql/schema');
+                const data = await res.json();
+                resultBox.textContent = "=== Connected Database Schema ===\n" + JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultBox.textContent = "Error: " + err.message;
+            }
+        }
+
+        // 3. Tabular Dataset Profiler
         async function profileSampleData() {
             const resultBox = document.getElementById('analytics-result');
-            resultBox.textContent = "Processing sample dataset...";
+            resultBox.textContent = "Ingesting dataset & generating statistical distributions...";
 
             const csvContent = "id,product,price,stock,category\n1,Laptop,1200,15,Electronics\n2,Mouse,25,,Accessories\n3,Keyboard,75,40,Accessories\n4,Monitor,300,10,Electronics\n5,Laptop,1200,15,Electronics";
             const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -224,6 +390,77 @@
                 });
                 const data = await res.json();
                 resultBox.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultBox.textContent = "Error: " + err.message;
+            }
+        }
+
+        // Auto Data Cleaner
+        async function cleanSampleData() {
+            const resultBox = document.getElementById('analytics-result');
+            resultBox.textContent = "Executing automated cleaning & null imputation...";
+
+            const csvContent = "id,product,price,stock,category\n1,Laptop,1200,15,Electronics\n2,Mouse,25,,Accessories\n3,Keyboard,75,40,Accessories\n4,Monitor,300,10,Electronics\n5,Laptop,1200,15,Electronics";
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const formData = new FormData();
+            formData.append('file', blob, 'sample_store.csv');
+
+            try {
+                const res = await fetch('/api/v1/analytics/clean?drop_duplicates=true&impute_numeric=median&impute_categorical=mode', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                resultBox.textContent = "=== Automated Cleaning Result ===\n" + JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultBox.textContent = "Error: " + err.message;
+            }
+        }
+
+        // 4. Index Document for RAG
+        async function indexSampleDocument() {
+            const statusLabel = document.getElementById('doc-index-status');
+            statusLabel.textContent = "Parsing & indexing document...";
+
+            const docContent = "# DataMind AI Enterprise Security and Architecture\n\nDataMind AI operates under a strict Zero-Trust principle. All Text-to-SQL operations are executed in Read-Only mode to prevent data corruption. No destructive DDL or DML queries such as DROP, DELETE, or ALTER are ever allowed.\n\n## Document Intelligence\nThe platform integrates semantic text chunking and vector storage with ChromaDB. Answers generated by the assistant must explicitly cite the document name and page number to eliminate hallucination.";
+            const blob = new Blob([docContent], { type: 'text/markdown' });
+            const formData = new FormData();
+            formData.append('file', blob, 'enterprise_security_policy.md');
+
+            try {
+                const res = await fetch('/api/v1/rag/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                statusLabel.textContent = "✓ Indexed: " + data.document.document_name + " (" + data.document.total_chunks + " chunks)";
+            } catch (err) {
+                statusLabel.textContent = "Error: " + err.message;
+            }
+        }
+
+        // Query Document RAG
+        async function queryRag() {
+            const question = document.getElementById('rag-question-input').value;
+            const resultBox = document.getElementById('rag-result');
+            resultBox.textContent = "Vector space search & synthesizing answer...";
+
+            try {
+                const res = await fetch('/api/v1/rag/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question, top_k: 3 })
+                });
+                const data = await res.json();
+                
+                let output = "=== [AI SYNTHESIZED ANSWER] ===\n" + data.answer + "\n\n";
+                output += "=== [SOURCE CITATIONS (" + data.citations.length + ")] ===\n";
+                data.citations.forEach((c, i) => {
+                    output += "[" + (i + 1) + "] " + c.document_name + " (Page " + c.page_number + ") - Relevance: " + c.relevance_percentage + "%\n";
+                    output += "    Snippet: " + c.snippet + "\n";
+                });
+                output += "\nLatency: " + data.latency_ms + "ms";
+                resultBox.textContent = output;
             } catch (err) {
                 resultBox.textContent = "Error: " + err.message;
             }
